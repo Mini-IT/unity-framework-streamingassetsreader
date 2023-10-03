@@ -12,9 +12,16 @@ namespace MiniIT.Unity
 			{
 				request.downloadHandler = new DownloadHandlerBuffer();
 
-				await request.SendWebRequest()
-					.WithCancellation(cancellationToken) // automatically calls request.Abort() on cancellation
-					.SuppressCancellationThrow();
+				try
+				{
+					await request.SendWebRequest()
+						.WithCancellation(cancellationToken) // automatically calls request.Abort() on cancellation
+						.SuppressCancellationThrow();
+				}
+				catch (UnityWebRequestException e)
+				{
+					UnityEngine.Debug.LogError($"[{nameof(AndroidStreamingAssetsReader)}] Failed to read file '{path}': {e}");
+				}
 
 				if (request.result == UnityWebRequest.Result.Success)
 				{
@@ -22,7 +29,7 @@ namespace MiniIT.Unity
 				}
 			}
 
-			return string.Empty;
+			return null;
 		}
 
 		public async UniTask<byte[]> ReadBytesAsync(string path, CancellationToken cancellationToken = default)
@@ -30,11 +37,18 @@ namespace MiniIT.Unity
 			using (var request = new UnityWebRequest(path))
 			{
 				request.downloadHandler = new DownloadHandlerBuffer();
-				
-				await request.SendWebRequest()
-					.WithCancellation(cancellationToken) // automatically calls request.Abort() on cancellation
-					.SuppressCancellationThrow();
-				
+
+				try
+				{
+					await request.SendWebRequest()
+						.WithCancellation(cancellationToken) // automatically calls request.Abort() on cancellation
+						.SuppressCancellationThrow();
+				}
+				catch (UnityWebRequestException e)
+				{
+					UnityEngine.Debug.LogError($"[{nameof(AndroidStreamingAssetsReader)}] Failed to read file '{path}': {e}");
+				}
+
 				if (request.result == UnityWebRequest.Result.Success)
 				{
 					return request.downloadHandler.data;
