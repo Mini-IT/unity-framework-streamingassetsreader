@@ -16,7 +16,8 @@ namespace MiniIT.Unity
 #if UNITY_2021_1_OR_NEWER
 					return await File.ReadAllTextAsync(path, cancellationToken);
 #else
-					return await UniTask.FromResult(File.ReadAllText(path)).AttachExternalCancellation(cancellationToken);
+					return await UniTask.FromResult(File.ReadAllText(path))
+						.AttachExternalCancellation(cancellationToken);
 #endif
 				}
 				catch (OperationCanceledException)
@@ -35,7 +36,8 @@ namespace MiniIT.Unity
 #if UNITY_2021_1_OR_NEWER
 				return await File.ReadAllBytesAsync(path, cancellationToken);
 #else
-				return await UniTask.FromResult(File.ReadAllBytes(path)).AttachExternalCancellation(cancellationToken);
+				return await UniTask.FromResult(File.ReadAllBytes(path))
+					.AttachExternalCancellation(cancellationToken);
 #endif
 			}
 
