@@ -12,11 +12,10 @@ namespace MiniIT.Unity
 		private static IStreamingAssetsReader GetInstance()
 		{
 #if (UNITY_ANDROID || UNITY_WEBGL) && !UNITY_EDITOR
-			s_instance ??= new AndroidStreamingAssetsReader();
+			return s_instance ??= new AndroidStreamingAssetsReader();
 #else
-			s_instance ??= new DefaultStreamingAssetsReader();
+			return s_instance ??= new DefaultStreamingAssetsReader();
 #endif
-			return s_instance;
 		}
 
 		private static string s_streamingAssetsPath;
