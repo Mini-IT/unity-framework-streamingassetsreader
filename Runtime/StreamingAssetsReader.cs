@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -26,6 +27,7 @@ namespace MiniIT.Unity
 		public static void Initialize()
 		{
 			s_streamingAssetsPath = Application.streamingAssetsPath;
+			GetInstance().Initialize(s_streamingAssetsPath);
 		}
 
 		public static async UniTask<string> ReadTextAsync(string path, CancellationToken cancellationToken = default)
@@ -38,6 +40,34 @@ namespace MiniIT.Unity
 		{
 			string fullPath = GetFullPath(path);
 			return await GetInstance().ReadBytesAsync(fullPath, cancellationToken);
+		}
+
+		public static bool FileExists(string path)
+		{
+			return GetInstance().FileExists(path);
+		}
+		public static bool DirectoryExists(string path)
+		{
+			return GetInstance().DirectoryExists(path);
+		}
+
+		public static string[] GetFiles(string path)
+		{
+			return GetFiles(path, null);
+		}
+
+		public static string[] GetFiles(string path, string searchPattern)
+		{
+			return GetFiles(path, searchPattern, SearchOption.TopDirectoryOnly);
+		}
+
+		public static string[] GetFiles(string path, string searchPattern, SearchOption searchOption)
+		{
+			if (path == null)
+			{
+				throw new ArgumentNullException("path");
+			}
+			return GetInstance().GetFiles(path, searchPattern, searchOption);
 		}
 
 		private static string GetFullPath(string path)
