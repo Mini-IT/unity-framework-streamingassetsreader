@@ -134,7 +134,7 @@ namespace MiniIT.Unity
 
 			for (int i = 0; i < _catalog.Count; ++i)
 			{
-				var filePath = _catalog[i];
+				string filePath = _catalog[i];
 
 				if (!filePath.StartsWith(path))
 				{
@@ -143,11 +143,13 @@ namespace MiniIT.Unity
 
 				string fileName;
 
-				var dirSeparatorIndex = filePath.LastIndexOf('/', filePath.Length - 1, filePath.Length - path.Length);
+				int dirSeparatorIndex = filePath.LastIndexOf('/', filePath.Length - 1, filePath.Length - path.Length);
 				if (dirSeparatorIndex >= 0)
 				{
 					if (searchOption == SearchOption.TopDirectoryOnly)
+					{
 						continue;
+					}
 
 					fileName = filePath.Substring(dirSeparatorIndex + 1);
 				}
