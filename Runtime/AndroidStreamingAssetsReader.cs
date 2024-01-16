@@ -188,16 +188,22 @@ namespace MiniIT.Unity
 
 		private string NormalizePath(string path)
 		{
+#if UNITY_2021_1_OR_NEWER
+			const char SLASH = '/';
+#else
+			const string SLASH = "/";
+#endif
+
 			path = path.Replace("\\", "/");
 
 			int start = 0;
 			int length = path.Length;
-			if (path.StartsWith('/'))
+			if (path.StartsWith(SLASH))
 			{
 				start = 1;
 				length--;
 			}
-			if (path.EndsWith('/'))
+			if (path.EndsWith(SLASH))
 			{
 				length--;
 			}
