@@ -9,7 +9,7 @@ public class FIlesCatalogBuilder : IPreprocessBuildWithReport
 {
 	private const string CATALOG_FILE_NAME = "__catalog__.txt";
 
-	public int callbackOrder => 0;
+	public int callbackOrder => int.MaxValue;
 
 	public void OnPreprocessBuild(BuildReport report)
 	{
