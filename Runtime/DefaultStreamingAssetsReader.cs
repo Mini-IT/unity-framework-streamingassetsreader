@@ -2,17 +2,21 @@
 using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using fbg;
 
 namespace MiniIT.Unity
 {
 	public class DefaultStreamingAssetsReader : IStreamingAssetsReader
 	{
+		public bool IsInitialized => _streamingAssetsPath != null;
+
 		private string _streamingAssetsPath;
 		private static string[] s_emptyArray;
 
-		public void Initialize(string path)
+		public UniTask Initialize(string path)
 		{
 			_streamingAssetsPath = path;
+			return UniTask.CompletedTask;
 		}
 
 		public async UniTask<string> ReadTextAsync(string path, CancellationToken cancellationToken = default)

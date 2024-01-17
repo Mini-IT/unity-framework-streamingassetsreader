@@ -8,6 +8,8 @@ namespace MiniIT.Unity
 {
 	public static class StreamingAssetsReader
 	{
+		public static bool IsInitialized => s_instance?.IsInitialized ?? false;
+
 		private static IStreamingAssetsReader s_instance;
 
 		private static IStreamingAssetsReader GetInstance()
@@ -24,10 +26,21 @@ namespace MiniIT.Unity
 		/// <summary>
 		/// Must be called from Unity main thread
 		/// </summary>
-		public static void Initialize()
+		public static void Initialize(Action callback = null)
+		{
+			InternalInitializeAsync(callback).Forget();
+		}
+
+		public static async UniTask InitializeAsync()
+		{
+			await InternalInitializeAsync();
+		}
+
+		private static async UniTask InternalInitializeAsync(Action callback = null)
 		{
 			s_streamingAssetsPath = Application.streamingAssetsPath;
-			GetInstance().Initialize(s_streamingAssetsPath);
+			await GetInstance().Initialize(s_streamingAssetsPath);
+			callback?.Invoke();
 		}
 
 		public static async UniTask<string> ReadTextAsync(string path, CancellationToken cancellationToken = default)

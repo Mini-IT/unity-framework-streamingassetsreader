@@ -13,16 +13,21 @@ namespace MiniIT.Unity
 	{
 		private const string CATALOG_FILE_NAME = "__catalog__.txt";
 
-		private bool IsInitialized => _catalog != null;
+		public bool IsInitialized => _catalog != null;
 
 		private static string[] s_emptyArray;
 		private string _streamingAssetsPath;
 		private List<string> _catalog = null;
 
-		public void Initialize(string path)
+		public async UniTask Initialize(string path)
 		{
+			if (_streamingAssetsPath == path)
+			{
+				return;
+			}
+
 			_streamingAssetsPath = path;
-			LoadCatalog();
+			await LoadCatalog();
 		}
 
 		public async UniTask<string> ReadTextAsync(string path, CancellationToken cancellationToken = default)
@@ -168,9 +173,9 @@ namespace MiniIT.Unity
 			return results.ToArray();
 		}
 
-		private void LoadCatalog()
+		private async UniTask LoadCatalog()
 		{
-			string text = ReadTextAsync(CATALOG_FILE_NAME).GetAwaiter().GetResult();
+			string text = await ReadTextAsync(CATALOG_FILE_NAME);
 			List<string> list = new List<string>();
 			using (var reader = new StreamReader(text))
 			{

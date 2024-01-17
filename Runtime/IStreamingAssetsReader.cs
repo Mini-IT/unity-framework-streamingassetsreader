@@ -6,7 +6,8 @@ namespace MiniIT.Unity
 {
 	public interface IStreamingAssetsReader
 	{
-		void Initialize(string path);
+		bool IsInitialized { get; }
+		UniTask Initialize(string path);
 		UniTask<string> ReadTextAsync(string path, CancellationToken cancellationToken = default);
 		UniTask<byte[]> ReadBytesAsync(string path, CancellationToken cancellationToken = default);
 		bool FileExists(string path);
