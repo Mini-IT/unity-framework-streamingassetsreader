@@ -21,8 +21,6 @@ namespace MiniIT.Unity
 #endif
 		}
 
-		private static string s_streamingAssetsPath;
-
 		/// <summary>
 		/// Must be called from Unity main thread
 		/// </summary>
@@ -38,8 +36,7 @@ namespace MiniIT.Unity
 
 		private static async UniTask InternalInitializeAsync(Action callback = null)
 		{
-			s_streamingAssetsPath = Application.streamingAssetsPath;
-			await GetInstance().Initialize(s_streamingAssetsPath);
+			await GetInstance().Initialize(Application.streamingAssetsPath);
 			callback?.Invoke();
 		}
 
@@ -85,13 +82,13 @@ namespace MiniIT.Unity
 
 		private static string GetFullPath(string path)
 		{
-			if (string.IsNullOrEmpty(s_streamingAssetsPath))
+			if (!IsInitialized)
 			{
 				// This will cause an error if called not from Unity main thread
 				Initialize();
 			}
 
-			return Path.Combine(s_streamingAssetsPath, path);
+			return GetInstance().GetFullPath(path);
 		}
 	}
 }

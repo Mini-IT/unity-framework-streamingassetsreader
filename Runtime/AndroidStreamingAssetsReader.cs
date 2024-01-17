@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -219,6 +218,16 @@ namespace MiniIT.Unity
 		public static Regex WildcardToRegex(string pattern)
 		{
 			return new Regex("^" + Regex.Escape(pattern).Replace(@"\*", ".*").Replace(@"\?", ".") + "$", RegexOptions.IgnoreCase);
+		}
+
+		public string GetFullPath(string path)
+		{
+			if (path.StartsWith(_streamingAssetsPath))
+			{
+				return path;
+			}
+
+			return Path.Combine(_streamingAssetsPath, path);
 		}
 	}
 }

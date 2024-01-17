@@ -86,5 +86,15 @@ namespace MiniIT.Unity
 #endif
 			return files;
 		}
+
+		public string GetFullPath(string path)
+		{
+			if (path.StartsWith(_streamingAssetsPath))
+			{
+				return path;
+			}
+
+			return Path.Combine(_streamingAssetsPath, path);
+		}
 	}
 }

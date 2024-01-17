@@ -13,5 +13,6 @@ namespace MiniIT.Unity
 		bool FileExists(string path);
 		bool DirectoryExists(string path);
 		string[] GetFiles(string path, string searchPattern, SearchOption searchOption);
+		string GetFullPath(string path);
 	}
 }
