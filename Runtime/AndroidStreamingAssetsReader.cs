@@ -23,6 +23,7 @@ namespace MiniIT.Unity
 		{
 			if (_streamingAssetsPath == path)
 			{
+				await UniTask.WaitUntil(() => IsInitialized);
 				return;
 			}
 
