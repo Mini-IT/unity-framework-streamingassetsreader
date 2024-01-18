@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using MiniIT.Unity.StreamingAssets;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace MiniIT.Unity
@@ -30,9 +31,9 @@ namespace MiniIT.Unity
 			await LoadCatalog();
 		}
 
-		public async UniTask<string> ReadTextAsync(string path, CancellationToken cancellationToken = default)
+		public async UniTask<string> ReadTextAsync(string fullPath, CancellationToken cancellationToken = default)
 		{
-			using (var request = UnityWebRequest.Get(path))
+			using (var request = UnityWebRequest.Get(fullPath))
 			{
 				request.downloadHandler = new DownloadHandlerBuffer();
 
@@ -44,7 +45,7 @@ namespace MiniIT.Unity
 				}
 				catch (UnityWebRequestException e)
 				{
-					UnityEngine.Debug.LogError($"[{nameof(AndroidStreamingAssetsReader)}] Failed to read file '{path}': {e}");
+					Debug.LogError($"[{nameof(AndroidStreamingAssetsReader)}] Failed to read file '{fullPath}': {e}");
 				}
 
 				if (request.result == UnityWebRequest.Result.Success)
@@ -56,9 +57,9 @@ namespace MiniIT.Unity
 			return null;
 		}
 
-		public async UniTask<byte[]> ReadBytesAsync(string path, CancellationToken cancellationToken = default)
+		public async UniTask<byte[]> ReadBytesAsync(string fullPath, CancellationToken cancellationToken = default)
 		{
-			using (var request = UnityWebRequest.Get(path))
+			using (var request = UnityWebRequest.Get(fullPath))
 			{
 				request.downloadHandler = new DownloadHandlerBuffer();
 
@@ -70,7 +71,7 @@ namespace MiniIT.Unity
 				}
 				catch (UnityWebRequestException e)
 				{
-					UnityEngine.Debug.LogError($"[{nameof(AndroidStreamingAssetsReader)}] Failed to read file '{path}': {e}");
+					Debug.LogError($"[{nameof(AndroidStreamingAssetsReader)}] Failed to read file '{fullPath}': {e}");
 				}
 
 				if (request.result == UnityWebRequest.Result.Success)
@@ -89,8 +90,15 @@ namespace MiniIT.Unity
 				return false;
 			}
 
-			path = NormalizePath(path);
-			return _catalog.Contains(path);
+			path = PathUtil.NormalizePath(path, false);
+			for (int i = 0; i < _catalog.Count; i++)
+			{
+				if (_catalog[i] == path)
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 		public bool DirectoryExists(string path)
@@ -100,10 +108,10 @@ namespace MiniIT.Unity
 				return false;
 			}
 
-			path = NormalizePath(path) + "/";
-			foreach (var line in _catalog)
+			path = PathUtil.NormalizePath(path, true);
+			for (int i = 0; i < _catalog.Count; i++)
 			{
-				if (line.StartsWith(path))
+				if (_catalog[i].StartsWith(path))
 				{
 					return true;
 				}
@@ -118,7 +126,7 @@ namespace MiniIT.Unity
 				return s_emptyArray ??= new string[0];
 			}
 
-			path = NormalizePath(path) + "/";
+			path = PathUtil.NormalizePath(path, true);
 
 			Predicate<string> filter;
 			if (string.IsNullOrEmpty(searchPattern) || searchPattern == "*")
@@ -127,7 +135,7 @@ namespace MiniIT.Unity
 			}
 			else if (searchPattern.IndexOf('*') >= 0 || searchPattern.IndexOf('?') >= 0)
 			{
-				var regex = WildcardToRegex(searchPattern);
+				var regex = PathUtil.WildcardToRegex(searchPattern);
 				filter = (x) => regex.IsMatch(x);
 			}
 			else
@@ -175,9 +183,18 @@ namespace MiniIT.Unity
 
 		private async UniTask LoadCatalog()
 		{
-			string text = await ReadTextAsync(CATALOG_FILE_NAME);
+			string filePath = PathUtil.GetFullPath(_streamingAssetsPath, CATALOG_FILE_NAME);
+			byte[] content = await ReadBytesAsync(filePath);
 			List<string> list = new List<string>();
-			using (var reader = new StreamReader(text))
+
+			if (content == null || content.Length == 0)
+			{
+				Debug.LogError($"[{nameof(AndroidStreamingAssetsReader)}] StreamingAssets catalog is empty: {filePath}");
+				_catalog = list;
+				return;
+			}
+
+			using (var reader = new StreamReader(new MemoryStream(content)))
 			{
 				while (!reader.EndOfStream)
 				{
@@ -191,43 +208,9 @@ namespace MiniIT.Unity
 			_catalog = list;
 		}
 
-		private string NormalizePath(string path)
-		{
-#if UNITY_2021_1_OR_NEWER
-			const char SLASH = '/';
-#else
-			const string SLASH = "/";
-#endif
-
-			path = path.Replace("\\", "/");
-
-			int start = 0;
-			int length = path.Length;
-			if (path.StartsWith(SLASH))
-			{
-				start = 1;
-				length--;
-			}
-			if (path.EndsWith(SLASH))
-			{
-				length--;
-			}
-			return path.Substring(start, length);
-		}
-
-		public static Regex WildcardToRegex(string pattern)
-		{
-			return new Regex("^" + Regex.Escape(pattern).Replace(@"\*", ".*").Replace(@"\?", ".") + "$", RegexOptions.IgnoreCase);
-		}
-
 		public string GetFullPath(string path)
 		{
-			if (path.StartsWith(_streamingAssetsPath))
-			{
-				return path;
-			}
-
-			return Path.Combine(_streamingAssetsPath, path);
+			return PathUtil.GetFullPath(_streamingAssetsPath, path);
 		}
 	}
 }

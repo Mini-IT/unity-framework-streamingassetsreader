@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using MiniIT.Unity.StreamingAssets;
 
 namespace MiniIT.Unity
 {
@@ -50,12 +51,14 @@ namespace MiniIT.Unity
 
 		public bool FileExists(string path)
 		{
-			return File.Exists(Path.Combine(_streamingAssetsPath, path));
+			path = PathUtil.GetFullPath(_streamingAssetsPath, path);
+			return File.Exists(path);
 		}
 
 		public bool DirectoryExists(string path)
 		{
-			return Directory.Exists(Path.Combine(_streamingAssetsPath, path));
+			path = PathUtil.GetFullPath(_streamingAssetsPath, path);
+			return Directory.Exists(path);
 		}
 
 		public string[] GetFiles(string path, string searchPattern, SearchOption searchOption)
@@ -65,11 +68,16 @@ namespace MiniIT.Unity
 				return s_emptyArray ??= new string[0];
 			}
 
-			string[] files = Directory.GetFiles(Path.Combine(_streamingAssetsPath, path), searchPattern ?? "*", searchOption);
+			if (PathUtil.FixSlashes(path) == "/")
+			{
+				path = "";
+			}
+
+			string[] files = Directory.GetFiles(PathUtil.GetFullPath(_streamingAssetsPath, path), searchPattern ?? "*", searchOption);
 
 			for (int i = 0; i < files.Length; ++i)
 			{
-				files[i] = files[i].Substring(_streamingAssetsPath.Length + 1).Replace('\\', '/');
+				files[i] = PathUtil.FixSlashes(files[i].Substring(_streamingAssetsPath.Length + 1));
 			}
 
 #if UNITY_EDITOR
@@ -89,12 +97,7 @@ namespace MiniIT.Unity
 
 		public string GetFullPath(string path)
 		{
-			if (path.StartsWith(_streamingAssetsPath))
-			{
-				return path;
-			}
-
-			return Path.Combine(_streamingAssetsPath, path);
+			return PathUtil.GetFullPath(_streamingAssetsPath, path);
 		}
 	}
 }

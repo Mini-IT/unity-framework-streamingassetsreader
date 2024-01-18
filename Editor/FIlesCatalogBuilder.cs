@@ -34,7 +34,7 @@ public class FIlesCatalogBuilder : IPreprocessBuildWithReport
 						continue;
 					}
 
-					writer.WriteLine(path.Replace(Application.streamingAssetsPath, "").Replace("\\", "/").Substring(1));
+					writer.WriteLine(path.Replace(Application.streamingAssetsPath, "").Replace("\\", "/"));
 				}
 			}
 		}
