@@ -32,7 +32,7 @@ namespace MiniIT.Unity
 
 		public async UniTask<string> ReadTextAsync(string path, CancellationToken cancellationToken = default)
 		{
-			using (var request = new UnityWebRequest(path))
+			using (var request = UnityWebRequest.Get(path))
 			{
 				request.downloadHandler = new DownloadHandlerBuffer();
 
@@ -58,7 +58,7 @@ namespace MiniIT.Unity
 
 		public async UniTask<byte[]> ReadBytesAsync(string path, CancellationToken cancellationToken = default)
 		{
-			using (var request = new UnityWebRequest(path))
+			using (var request = UnityWebRequest.Get(path))
 			{
 				request.downloadHandler = new DownloadHandlerBuffer();
 
