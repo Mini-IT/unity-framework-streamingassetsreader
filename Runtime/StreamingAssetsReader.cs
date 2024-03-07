@@ -52,6 +52,12 @@ namespace MiniIT.Unity
 			return await GetInstance().ReadBytesAsync(fullPath, cancellationToken);
 		}
 
+		public static async UniTask<bool> CopyToFileAsync(string inputPath, string outputPath, CancellationToken cancellationToken = default)
+		{
+			string fullPath = GetFullPath(inputPath);
+			return await GetInstance().CopyToFileAsync(fullPath, outputPath, cancellationToken);
+		}
+
 		public static bool FileExists(string path)
 		{
 			return GetInstance().FileExists(path);

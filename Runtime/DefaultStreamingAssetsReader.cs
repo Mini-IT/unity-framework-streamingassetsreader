@@ -49,6 +49,24 @@ namespace MiniIT.Unity
 #endif
 		}
 
+		public async UniTask<bool> CopyToFileAsync(string inputPath, string outputPath, CancellationToken cancellationToken = default)
+		{
+			if (!File.Exists(inputPath))
+			{
+				return false;
+			}
+
+			using (var input = File.OpenRead(inputPath))
+			{
+				using (var output = File.OpenWrite(outputPath))
+				{
+					await input.CopyToAsync(output, cancellationToken);
+				}
+			}
+
+			return true;
+		}
+
 		public bool FileExists(string path)
 		{
 			path = PathUtil.GetFullPath(_streamingAssetsPath, path);

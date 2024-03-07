@@ -83,6 +83,27 @@ namespace MiniIT.Unity
 			return null;
 		}
 
+		public async UniTask<bool> CopyToFileAsync(string inputPath, string outputPath, CancellationToken cancellationToken = default)
+		{
+			using (var request = UnityWebRequest.Get(inputPath))
+			{
+				request.downloadHandler = new DownloadHandlerFile(outputPath);
+
+				try
+				{
+					await request.SendWebRequest()
+						.WithCancellation(cancellationToken) // automatically calls request.Abort() on cancellation
+						.SuppressCancellationThrow();
+				}
+				catch (UnityWebRequestException e)
+				{
+					Debug.LogError($"[{nameof(AndroidStreamingAssetsReader)}] Failed to read file '{inputPath}': {e}");
+				}
+
+				return (request.result == UnityWebRequest.Result.Success);
+			}
+		}
+
 		public bool FileExists(string path)
 		{
 			if (_catalog == null)
