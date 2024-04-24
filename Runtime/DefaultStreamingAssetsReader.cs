@@ -60,7 +60,11 @@ namespace MiniIT.Unity
 			{
 				using (var output = File.OpenWrite(outputPath))
 				{
+#if UNITY_2021_1_OR_NEWER
 					await input.CopyToAsync(output, cancellationToken);
+#else
+					await input.CopyToAsync(output, 4096, cancellationToken);
+#endif
 				}
 			}
 

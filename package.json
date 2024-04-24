@@ -1,6 +1,6 @@
 {
 	"name": "com.miniit.framework.streamingassetsreader",
-	"version": "2.1.0",
+	"version": "2.1.1",
 	"dependencies": {
 		"com.cysharp.unitask": "2.3.0"
 	},
