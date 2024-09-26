@@ -26,12 +26,21 @@ namespace MiniIT.Unity
 		/// </summary>
 		public static void Initialize(Action callback = null)
 		{
+			if (IsInitialized)
+			{
+				callback?.Invoke();
+				return;
+			}
+
 			InternalInitializeAsync(callback).Forget();
 		}
 
 		public static async UniTask InitializeAsync()
 		{
-			await InternalInitializeAsync();
+			if (!IsInitialized)
+			{
+				await InternalInitializeAsync();
+			}
 		}
 
 		private static async UniTask InternalInitializeAsync(Action callback = null)
