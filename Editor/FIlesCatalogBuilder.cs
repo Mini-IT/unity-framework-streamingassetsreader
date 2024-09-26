@@ -19,6 +19,11 @@ public class FIlesCatalogBuilder : IPreprocessBuildWithReport
 	[MenuItem("Tools/Build SA Catalog")]
 	public static void PrepareStreamingAssetsFilesCatalog()
 	{
+		if (!Directory.Exists(Application.streamingAssetsPath))
+		{
+			return;
+		}
+
 		string catalogFilePath = Path.Combine(Application.streamingAssetsPath, CATALOG_FILE_NAME);
 		FileUtil.DeleteFileOrDirectory(catalogFilePath);
 
